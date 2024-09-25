@@ -41,6 +41,7 @@ const [count,setCount] = useState(1)
   };
 useEffect(()=>{
   const total_Cost= selectedTripValue * count
+  console.log(total_Cost)
 },[selectedTripValue,count])
   return (
     <Formik

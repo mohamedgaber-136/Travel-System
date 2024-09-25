@@ -8,7 +8,6 @@ import { Button, Modal } from "@mui/material";
 import data from "layouts/tables/data/authorsTableData";
 
 const FromToDateRange = ({ setDateRange }) => {
-  const [openDate, setOpenDate] = useState(false);
   const wrapperRef = useRef(null); // Ref for wrapping div
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -46,7 +45,7 @@ const FromToDateRange = ({ setDateRange }) => {
         className="border h-100 p-0 w-100 align-items-center justify-content-center rounded d-flex flex-column"
         onClick={handleOpen}
       >
-        <div >
+        <div className="w-100">
           <div className="headerSearchText rounded d-flex justify-content-around w-100">
             <span className="text-success">
               {format(date[0]?.startDate, "MM/dd/yyyy")}

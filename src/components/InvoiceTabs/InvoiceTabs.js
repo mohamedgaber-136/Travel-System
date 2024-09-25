@@ -4,6 +4,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import { IndividualFormData } from "components/InvoiceForm/IndividualForm";
+import { PackagesForm } from "components/InvoiceForm/packagesForm";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -54,7 +55,7 @@ export default function BasicTabs() {
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        Item One
+        <PackagesForm/>
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         <IndividualFormData />

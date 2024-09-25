@@ -63,7 +63,7 @@ export const IndividualFormData = () => {
         <Form>
           <Typography component="h1">Invoice #1</Typography>
           <Paper sx={{ padding: "50px", borderRadius: "20px" }}>
-            <Grid container alignItems={"stretch"} gap={"10px"} justifyContent={"center"}>
+            <Grid container alignItems={"stretch"} spacing={2} justifyContent={"center"}>
               {/* Name Field */}
               <Grid item xs={12} md={3}>
                 <Field as={TextField} id="name" label="Client Name" variant="outlined" name="name" type="text" fullWidth />
@@ -137,7 +137,7 @@ export const IndividualFormData = () => {
               </Grid>
 
               {/* Cost Per Night Field */}
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={4}>
                 <Field
                   as={TextField}
                   id="cost_per_night"
@@ -154,7 +154,7 @@ export const IndividualFormData = () => {
               </Grid>
 
               {/* Paid Field */}
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={4}>
                 <Field
                   as={TextField}
                   id="paid"
@@ -171,7 +171,7 @@ export const IndividualFormData = () => {
               </Grid>
 
               {/* Rest Field */}
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={4}>
                 <Field
                   as={TextField}
                   id="rest"

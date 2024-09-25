@@ -50,8 +50,8 @@ function Breadcrumbs({ icon, title, route, light }) {
             <Icon>{icon}</Icon>
           </MDTypography>
         </Link>
-        {routes.map((el) => (
-          <Link to={`/${el}`} key={el}>
+        {routes.map((el,ind) => (
+          <Link to={`/${el}`} key={el+ind}>
             <MDTypography
               component="span"
               variant="button"

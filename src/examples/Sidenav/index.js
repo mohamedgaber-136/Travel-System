@@ -66,9 +66,9 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   useEffect(() => {
     // A function that sets the mini state of the sidenav.
     function handleMiniSidenav() {
-      setMiniSidenav(dispatch, window.innerWidth < 1200);
-      setTransparentSidenav(dispatch, window.innerWidth < 1200 ? false : transparentSidenav);
-      setWhiteSidenav(dispatch, window.innerWidth < 1200 ? false : whiteSidenav);
+      setMiniSidenav(dispatch, window.innerWidth < 768);
+      setTransparentSidenav(dispatch, window.innerWidth < 768 ? false : transparentSidenav);
+      setWhiteSidenav(dispatch, window.innerWidth < 768 ? false : whiteSidenav);
     }
 
     /** 
@@ -86,7 +86,6 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   // Render all the routes from the routes.js (All the visible items on the Sidenav)
   const renderRoutes = routes.map(({ type, name, icon, title, noCollapse, key, href, route }) => {
     let returnValue;
-
     if (type === "collapse") {
       returnValue = href ? (
         <Link

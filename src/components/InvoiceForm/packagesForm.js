@@ -13,19 +13,16 @@ import { TripDropDown } from "components/TripDropDown";
 
 export const PackagesForm = () => {
   const [selectedTripValue, setSelectedTripValue] = useState(null); // State to store the selected trip
-const [count,setCount] = useState(1)
   const validationSchema = Yup.object({
     name: Yup.string()
       .min(2, "Too Short!")
       .max(50, "Too Long!")
       .required("Name is required"),
-    national_id: Yup.number().required("NationalId is required"),
-    phone_number: Yup.number().required("Telephone is required"),
-    alternative_phone_number: Yup.number().required("Telephone is required"),
-    nights: Yup.number().required("Nights is required"),
+    national_id: Yup.string().required("NationalId is required"),
+    phone_number: Yup.string().required("Telephone is required"),
+    alternative_phone_number: Yup.string().required("Telephone is required"),
     count: Yup.number().required("Count is required"),
     paid: Yup.number().required("Paid is required"),
-    hotel: Yup.string().required("hotel is required"),
   });
   const initialValues = {
     name: "",
@@ -38,11 +35,9 @@ const [count,setCount] = useState(1)
     paid: "",
     rest: "",
     notes: "",
+    discount:''
   };
-useEffect(()=>{
-  const total_Cost= selectedTripValue * count
-  console.log(total_Cost)
-},[selectedTripValue,count])
+
   return (
     <Formik
       initialValues={initialValues}
@@ -52,7 +47,7 @@ useEffect(()=>{
         setSubmitting(false); // To indicate form submission is done
       }}
     >
-      {({ isSubmitting, setFieldValue }) => ( // Destructure setFieldValue here
+      {({ isSubmitting, setFieldValue, values }) => ( // Destructure setFieldValue here
         <Form>
           <Typography component="h1">Invoice #1</Typography>
 
@@ -195,9 +190,17 @@ useEffect(()=>{
                   name="count"
                   type="text"
                   fullWidth
-                  onChange={(e)=>{
-                    setCount(e.target.value);
-                  }}
+                
+                      onChange={(e) => {
+                        const countValue = e.target.value;
+                        const totalCost = countValue * selectedTripValue;
+                        setFieldValue("total_cost", totalCost);
+                        setFieldValue("count", countValue);
+                        setFieldValue("rest", totalCost - values.paid);
+                      }}
+                    
+                  
+                
                 />
                 <ErrorMessage
                   name="count"
@@ -221,6 +224,7 @@ useEffect(()=>{
                   name="total_cost"
                   type="text"
                   fullWidth
+                  disabled
                 />
                 <ErrorMessage
                   name="total_cost"
@@ -245,6 +249,11 @@ useEffect(()=>{
                   name="paid"
                   type="text"
                   fullWidth
+                  onChange={(e) => {
+                    const paidValue = e.target.value;
+                    setFieldValue("paid", paidValue);
+                    setFieldValue("rest", values.total_cost - paidValue);
+                  }}
                 />
                 <ErrorMessage
                   name="paid"
@@ -268,6 +277,7 @@ useEffect(()=>{
                   name="rest"
                   type="text"
                   fullWidth
+                  disabled
                 />
                 <ErrorMessage
                   name="rest"
@@ -282,6 +292,7 @@ useEffect(()=>{
                   )}
                 />
               </Grid>
+              
               <Grid item xs={12}>
                 <TextField
                   multiline

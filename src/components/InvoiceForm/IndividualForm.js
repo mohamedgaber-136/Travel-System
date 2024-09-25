@@ -1,38 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { Button, Container, Grid, Paper, TextField } from "@mui/material";
+import { Button, Container, Grid, Paper, TextField, Typography } from "@mui/material";
 import FromToDateRange from "components/FromToDateRange/FromToDateRange";
-export const IndividualFormData = () => {
-  // client name
-  // identity number
-  // phone number
-  // another number
-  // hotel name
-  // from ... to "date"  count of nights
-  // cost per night
-  // count of person PAX
-  // paid
-  // rest of cost
-  // notes  "text"  -- feature to choose transportation
 
+export const IndividualFormData = () => {
   const validationSchema = Yup.object({
     name: Yup.string()
       .min(2, "Too Short!")
       .max(50, "Too Long!")
       .required("Name is required"),
-    national_id: Yup.number().required("national id is required"),
-    phone_number: Yup.number().required("phone number is required"),
-    alternative_phone_number: Yup.number().required(
-      "alternative phone is required"
-    ),
-    hotel_name: Yup.string().required("hotel name is required"),
-    from_date: Yup.string().required("from date is required"),
-    to_date: Yup.string().required("to date is required"),
-    cost_per_night: Yup.number().required("cost per night is required"),
+    national_id: Yup.number('Only numbers allowed').required("National ID is required"),
+    phone_number: Yup.number('Only numbers allowed').required("Phone number is required"),
+    alternative_phone_number: Yup.number('Only numbers allowed').required("Alternative phone number is required"),
+    hotel_name: Yup.string().required("Hotel name is required"),
+    from_date: Yup.string().required("From date is required"),
+    to_date: Yup.string().required("To date is required"),
+    cost_per_night: Yup.number().required("Cost per night is required"),
     nights: Yup.number().required("Nights is required"),
-    paid: Yup.number().required("Paid is required"),
-    rest: Yup.number().required("rest cost is required"),
+    paid: Yup.number().required("Paid amount is required"),
+    rest: Yup.number().required("Rest amount is required"),
     count_PAX: Yup.number().required("Count is required"),
     notes: Yup.string(),
   });
@@ -46,119 +33,63 @@ export const IndividualFormData = () => {
     from_date: "",
     to_date: "",
     cost_per_night: 0,
-    nights: 0,
-    paid: "",
+    nights: 1,
+    paid: 0,
     rest: 0,
-    count_PAX: 0,
+    count_PAX: 1,
     notes: "",
   };
-
+  const calculateNights = (fromDate, toDate, setFieldValue) => {
+    const from = new Date(fromDate);
+    const to = new Date(toDate);
+    const diffTime = Math.abs(to - from);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    setFieldValue("nights", diffDays);
+  };
+;
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
-        console.log(values, "test");
+        const totalPrice = Number(values.count_PAX) * Number(values.cost_per_night) * Number(values.nights);
+        const restOfAmount = totalPrice - Number(values.paid);
+        values.rest = restOfAmount; // Update rest value in the form values
+        console.log(values, "Submitted values");
         setSubmitting(false); // To indicate form submission is done
       }}
     >
-      {({ isSubmitting, errors, setFieldValue }) => (
+      {({ isSubmitting, setFieldValue, values }) => (
         <Form>
-          {console.log(errors, "errors")}
-          <Paper
-            sx={{
-              padding: "50px",
-              borderRadius: "20px",
-            }}
-          >
-            <Grid
-              container
-              alignItems={"stretch"}
-              gap={"10px"}
-              justifyContent={"center"}
-            >
+          <Typography component="h1">Invoice #1</Typography>
+          <Paper sx={{ padding: "50px", borderRadius: "20px" }}>
+            <Grid container alignItems={"stretch"} gap={"10px"} justifyContent={"center"}>
               {/* Name Field */}
-
               <Grid item xs={12} md={3}>
-                <Field
-                  as={TextField}
-                  id="name"
-                  label="Name"
-                  variant="outlined"
-                  name="name"
-                  type="text"
-                  fullWidth
-                />
-                <ErrorMessage name="name" component="div" className="error" />
-              </Grid>
-              {/* tel Field */}
-              <Grid item xs={12} md={3}>
-                <Field
-                  as={TextField}
-                  id="phone_number"
-                  label="Phone Number"
-                  variant="outlined"
-                  name="phone_number"
-                  type="text"
-                  fullWidth
-                />
-                <ErrorMessage
-                  name="phone_number"
-                  component="div"
-                  className="error"
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <Field
-                  as={TextField}
-                  id="alternative_phone_number"
-                  label="Alternative Phone"
-                  variant="outlined"
-                  name="alternative_phone_number"
-                  type="text"
-                  fullWidth
-                />
-                <ErrorMessage
-                  name="alternative_phone_number"
-                  component="div"
-                  className="error"
-                />
+                <Field as={TextField} id="name" label="Client Name" variant="outlined" name="name" type="text" fullWidth />
+                <ErrorMessage name="name" component={({ children }) => <Typography variant="body2" color="error" sx={{ fontSize: "0.875rem" }}>{children}</Typography>} />
               </Grid>
 
-              {/* NationalID Field */}
-
+              {/* Phone Number Fields */}
               <Grid item xs={12} md={3}>
-                <Field
-                  as={TextField}
-                  id="national_id"
-                  label="National-Id"
-                  variant="outlined"
-                  name="national_id"
-                  type="text"
-                  fullWidth
-                />
-                <ErrorMessage
-                  name="national_id"
-                  component="div"
-                  className="error"
-                />
+                <Field as={TextField} id="phone_number" label="Phone Number" variant="outlined" name="phone_number" type="text" fullWidth />
+                <ErrorMessage name="phone_number" component={({ children }) => <Typography variant="body2" color="error" sx={{ fontSize: "0.875rem" }}>{children}</Typography>} />
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Field as={TextField} id="alternative_phone_number" label="Other Phone" variant="outlined" name="alternative_phone_number" type="text" fullWidth />
+                <ErrorMessage name="alternative_phone_number" component={({ children }) => <Typography variant="body2" color="error" sx={{ fontSize: "0.875rem" }}>{children}</Typography>} />
               </Grid>
 
+              {/* National ID Field */}
               <Grid item xs={12} md={3}>
-                <Field
-                  as={TextField}
-                  id="hotel_name"
-                  label="Hotel"
-                  variant="outlined"
-                  name="hotel_name"
-                  type="text"
-                  fullWidth
-                />
-                <ErrorMessage
-                  name="hotel_name"
-                  component="div"
-                  className="error"
-                />
+                <Field as={TextField} id="national_id" label="National ID" variant="outlined" name="national_id" type="text" fullWidth />
+                <ErrorMessage name="national_id" component={({ children }) => <Typography variant="body2" color="error" sx={{ fontSize: "0.875rem" }}>{children}</Typography>} />
+              </Grid>
+
+              {/* Hotel Name Field */}
+              <Grid item xs={12} md={3}>
+                <Field as={TextField} id="hotel_name" label="Hotel" variant="outlined" name="hotel_name" type="text" fullWidth />
+                <ErrorMessage name="hotel_name" component={({ children }) => <Typography variant="body2" color="error" sx={{ fontSize: "0.875rem" }}>{children}</Typography>} />
               </Grid>
 
               {/* From-To Date Range */}
@@ -167,27 +98,62 @@ export const IndividualFormData = () => {
                   setDateRange={(fromDate, toDate) => {
                     setFieldValue("from_date", fromDate);
                     setFieldValue("to_date", toDate);
+                    calculateNights(fromDate, toDate, setFieldValue);
                   }}
                 />
               </Grid>
 
+              {/* Count PAX Field */}
               <Grid item xs={12} md={3}>
                 <Field
                   as={TextField}
                   id="count_PAX"
-                  label="Count"
+                  label="Adults"
                   variant="outlined"
                   name="count_PAX"
                   type="text"
                   fullWidth
+                  onChange={(e) => {
+                    setFieldValue("count_PAX", e.target.value);
+                  }}
                 />
-                <ErrorMessage
-                  name="count_PAX"
-                  component="div"
-                  className="error"
-                />
+                <ErrorMessage name="count_PAX" component={({ children }) => <Typography variant="body2" color="error" sx={{ fontSize: "0.875rem" }}>{children}</Typography>} />
               </Grid>
 
+              {/* Nights Field */}
+              <Grid item xs={12} md={3}>
+                <Field
+                  as={TextField}
+                  id="nights"
+                  label="Nights"
+                  variant="outlined"
+                  name="nights"
+                  type="text"
+                  fullWidth
+                  value={values.nights}
+                  disabled
+                />
+                <ErrorMessage name="nights" component={({ children }) => <Typography variant="body2" color="error" sx={{ fontSize: "0.875rem" }}>{children}</Typography>} />
+              </Grid>
+
+              {/* Cost Per Night Field */}
+              <Grid item xs={12} md={3}>
+                <Field
+                  as={TextField}
+                  id="cost_per_night"
+                  label="Cost per Night"
+                  variant="outlined"
+                  name="cost_per_night"
+                  type="text"
+                  fullWidth
+                  onChange={(e) => {
+                    setFieldValue("cost_per_night", e.target.value);
+                  }}
+                />
+                <ErrorMessage name="cost_per_night" component={({ children }) => <Typography variant="body2" color="error" sx={{ fontSize: "0.875rem" }}>{children}</Typography>} />
+              </Grid>
+
+              {/* Paid Field */}
               <Grid item xs={12} md={3}>
                 <Field
                   as={TextField}
@@ -197,58 +163,49 @@ export const IndividualFormData = () => {
                   name="paid"
                   type="text"
                   fullWidth
+                  onChange={(e) => {
+                    setFieldValue("paid", e.target.value);
+                  }}
                 />
-                <ErrorMessage name="paid" component="div" className="error" />
+                <ErrorMessage name="paid" component={({ children }) => <Typography variant="body2" color="error" sx={{ fontSize: "0.875rem" }}>{children}</Typography>} />
               </Grid>
 
+              {/* Rest Field */}
               <Grid item xs={12} md={3}>
                 <Field
                   as={TextField}
-                  id="Rest"
-                  label="rest"
+                  id="rest"
+                  label="Rest"
                   variant="outlined"
                   name="rest"
                   type="text"
                   disabled
-                  readonly
+                  value={values.rest}
                   fullWidth
                 />
-                <ErrorMessage name="rest" component="div" className="error" />
+                <ErrorMessage name="rest" component={({ children }) => <Typography variant="body2" color="error" sx={{ fontSize: "0.875rem" }}>{children}</Typography>} />
               </Grid>
-              <Grid item xs={12} md={9}>
-                <Field
-                  as={TextField}
-                  id="notes"
-                  label="Notes"
-                  variant="outlined"
-                  name="notes"
-                  type="text"
-                  fullWidth
-                />
-                <ErrorMessage name="notes" component="div" className="error" />
+
+              {/* Notes Field */}
+              <Grid item xs={12}>
+                <Field as={TextField} id="notes" label="Notes" variant="outlined" name="notes" multiline rows={4} fullWidth />
+                <ErrorMessage name="notes" component={({ children }) => <Typography variant="body2" color="error" sx={{ fontSize: "0.875rem" }}>{children}</Typography>} />
+              </Grid>
+
+              {/* Submit Button */}
+              <Grid item xs={12} display={'flex'} justifyContent={'center'}>
+                <Button type="submit" variant="dark" sx={{
+                  border:'1px solid'
+                }}  disabled={isSubmitting}>
+                  {isSubmitting ? "Submitting..." : "Submit"}
+                </Button>
               </Grid>
             </Grid>
-            {/* Submit Button */}
-            <Container
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <Button
-                variant="dark"
-                type="submit"
-                sx={{
-                  border: "1px solid black",
-                  margin: "20px 0 0 0",
-                }}
-              >
-                Done
-              </Button>
-            </Container>
           </Paper>
         </Form>
       )}
     </Formik>
   );
 };
+
+export default IndividualFormData;

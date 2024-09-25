@@ -43,7 +43,7 @@ export default function BasicTabs() {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+      <Box >
         <Tabs
           value={value}
           onChange={handleChange}

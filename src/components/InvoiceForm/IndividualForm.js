@@ -1,10 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Button, Container, Grid, Paper, TextField, Typography } from "@mui/material";
 import FromToDateRange from "components/FromToDateRange/FromToDateRange";
 
 export const IndividualFormData = () => {
+  const [formValues, setFormValues] = useState({
+    count_PAX: 0,
+    cost_per_night: 0,
+    nights: 0,
+    paid: 0,
+  })
+
   const validationSchema = Yup.object({
     name: Yup.string()
       .min(2, "Too Short!")
@@ -45,22 +52,52 @@ export const IndividualFormData = () => {
     const diffTime = Math.abs(to - from);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     setFieldValue("nights", diffDays);
+    setFormValues({
+      ...formValues,
+      nights: Number(diffDays)
+    })
   };
-;
+
+  const calculateValues = (values, setFieldValue) => {
+    const from = new Date(values.from_date);
+    const to = new Date(values.to_date);
+    const diffDays = Math.ceil(Math.abs(to - from) / (1000 * 60 * 60 * 24));
+
+    const nights = diffDays > 0 ? diffDays : 0;
+    const totalPrice = values.count_PAX * values.cost_per_night * nights;
+    const restOfAmount = totalPrice - values.paid;
+
+    setFieldValue("nights", nights);
+    setFieldValue("rest", restOfAmount);
+  };
+
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={(values, { setSubmitting }) => {
-        const totalPrice = Number(values.count_PAX) * Number(values.cost_per_night) * Number(values.nights);
-        const restOfAmount = totalPrice - Number(values.paid);
-        values.rest = restOfAmount; // Update rest value in the form values
+        // const totalPrice = Number(values.count_PAX) * Number(values.cost_per_night) * Number(values.nights);
+        // const restOfAmount = totalPrice - Number(values.paid);
+        // values.rest = restOfAmount; // Update rest value in the form values
         console.log(values, "Submitted values");
         setSubmitting(false); // To indicate form submission is done
       }}
     >
-      {({ isSubmitting, setFieldValue, values }) => (
-        <Form>
+      {({ isSubmitting, setFieldValue, values }) => {
+
+        // useEffect(() => {
+        //   const totalPrice = formValues.count_PAX * formValues.cost_per_night * formValues.nights;
+        //   const restOfAmount = totalPrice - formValues.paid;
+        //   console.log('calculate rest', restOfAmount)
+        //   setFieldValue("rest", restOfAmount); // Update the rest field
+        // }, [formValues, setFieldValue]);
+
+        useEffect(() => {
+          calculateValues(values, setFieldValue);
+        }, [values.from_date, values.to_date, values.cost_per_night, values.paid, values.count_PAX]);
+
+
+        return <Form>
           <Typography component="h1">Invoice #1</Typography>
           <Paper sx={{ padding: "50px", borderRadius: "20px" }}>
             <Grid container alignItems={"stretch"} gap={"10px"} justifyContent={"center"}>
@@ -98,7 +135,7 @@ export const IndividualFormData = () => {
                   setDateRange={(fromDate, toDate) => {
                     setFieldValue("from_date", fromDate);
                     setFieldValue("to_date", toDate);
-                    calculateNights(fromDate, toDate, setFieldValue);
+                    // calculateNights(fromDate, toDate, setFieldValue);
                   }}
                 />
               </Grid>
@@ -113,9 +150,13 @@ export const IndividualFormData = () => {
                   name="count_PAX"
                   type="text"
                   fullWidth
-                  onChange={(e) => {
-                    setFieldValue("count_PAX", e.target.value);
-                  }}
+                  // onChange={(e) => {
+                  //   setFieldValue("count_PAX", e.target.value);
+                  //   // setFormValues({
+                  //   //   ...formValues,
+                  //   //   count_PAX: Number(e.target.value)
+                  //   // })
+                  // }}
                 />
                 <ErrorMessage name="count_PAX" component={({ children }) => <Typography variant="body2" color="error" sx={{ fontSize: "0.875rem" }}>{children}</Typography>} />
               </Grid>
@@ -132,6 +173,12 @@ export const IndividualFormData = () => {
                   fullWidth
                   value={values.nights}
                   disabled
+                  // onChange={(e) => {
+                  //   setFormValues({
+                  //     ...formValues,
+                  //     nights: Number(e.target.value)
+                  //   })
+                  // }}
                 />
                 <ErrorMessage name="nights" component={({ children }) => <Typography variant="body2" color="error" sx={{ fontSize: "0.875rem" }}>{children}</Typography>} />
               </Grid>
@@ -146,9 +193,13 @@ export const IndividualFormData = () => {
                   name="cost_per_night"
                   type="text"
                   fullWidth
-                  onChange={(e) => {
-                    setFieldValue("cost_per_night", e.target.value);
-                  }}
+                  // onChange={(e) => {
+                  //   setFieldValue("cost_per_night", e.target.value);
+                  //   setFormValues({
+                  //     ...formValues,
+                  //     cost_per_night: Number(e.target.value)
+                  //   })
+                  // }}
                 />
                 <ErrorMessage name="cost_per_night" component={({ children }) => <Typography variant="body2" color="error" sx={{ fontSize: "0.875rem" }}>{children}</Typography>} />
               </Grid>
@@ -163,9 +214,13 @@ export const IndividualFormData = () => {
                   name="paid"
                   type="text"
                   fullWidth
-                  onChange={(e) => {
-                    setFieldValue("paid", e.target.value);
-                  }}
+                  // onChange={(e) => {
+                  //   setFieldValue("paid", e.target.value);
+                  //   setFormValues({
+                  //     ...formValues,
+                  //     paid: Number(e.target.value)
+                  //   })
+                  // }}
                 />
                 <ErrorMessage name="paid" component={({ children }) => <Typography variant="body2" color="error" sx={{ fontSize: "0.875rem" }}>{children}</Typography>} />
               </Grid>
@@ -195,15 +250,15 @@ export const IndividualFormData = () => {
               {/* Submit Button */}
               <Grid item xs={12} display={'flex'} justifyContent={'center'}>
                 <Button type="submit" variant="dark" sx={{
-                  border:'1px solid'
-                }}  disabled={isSubmitting}>
+                  border: '1px solid'
+                }} disabled={isSubmitting}>
                   {isSubmitting ? "Submitting..." : "Submit"}
                 </Button>
               </Grid>
             </Grid>
           </Paper>
         </Form>
-      )}
+      }}
     </Formik>
   );
 };
